@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwiftMapper", "SwiftMapper\SwiftMapper.csproj", "{8A8561EF-FB4F-4924-A485-D58B87CD9524}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwiftMapper.Tests", "SwiftMapper.Tests\SwiftMapper.Tests.csproj", "{0C42BA52-03E1-4F33-94C2-463B0F5B8F06}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{8A8561EF-FB4F-4924-A485-D58B87CD9524}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A8561EF-FB4F-4924-A485-D58B87CD9524}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A8561EF-FB4F-4924-A485-D58B87CD9524}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C42BA52-03E1-4F33-94C2-463B0F5B8F06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C42BA52-03E1-4F33-94C2-463B0F5B8F06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C42BA52-03E1-4F33-94C2-463B0F5B8F06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C42BA52-03E1-4F33-94C2-463B0F5B8F06}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
