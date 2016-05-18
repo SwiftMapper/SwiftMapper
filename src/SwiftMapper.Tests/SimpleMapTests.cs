@@ -23,8 +23,10 @@ namespace SwiftMapper.Tests
             };
 
             var dto = mapper.Map<SimpleUser, SimpleUserDto>(user);
-
             Assert.AreEqual(user.ToString(), dto.ToString());
+
+            var dto2 = mapper.Map2<SimpleUser, SimpleUserDto>(user);
+            Assert.AreEqual(user.ToString(), dto2.ToString());
         }
     }
 }

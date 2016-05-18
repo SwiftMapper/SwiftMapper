@@ -8,6 +8,9 @@ namespace SwiftMapper
 {
     internal class MappingCompiler
     {
+        private const string StaticMethodName = "MapStatic";
+        private const string InstanceMethodName = "Map";
+
         public MappingCompiler()
         {
             Name = $"SwiftMapper_{DateTime.Now.ToString("yyyyMMddHHmmss")}";
@@ -35,7 +38,7 @@ namespace SwiftMapper
             return expression;
         }
 
-        internal Type GetType<TSource, TDestination>(Expression<Func<TSource, TDestination>> expression)
+        private string GetMappingTypeName<TSource, TDestination>()
         {
             var sourceType = typeof(TSource);
             var destinationType = typeof(TDestination);
@@ -44,23 +47,51 @@ namespace SwiftMapper
             var destinationName = destinationType.FullName.Replace(".", "_");
 
             var typeName = $"{sourceName}To{destinationName}";
+            return typeName;
+        }
+
+        internal Type GetType<TSource, TDestination>(Expression<Func<TSource, TDestination>> expression)
+        {
+            var typeName = GetMappingTypeName<TSource, TDestination>();
+            var interfaceType = typeof(IMapping<TSource, TDestination>);
 
             var typeBuilder = ModuleBuilder.DefineType(typeName, TypeAttributes.Public | TypeAttributes.Sealed);
-            var methodBuilder = typeBuilder.DefineMethod(typeName, MethodAttributes.Public | MethodAttributes.Static);
+            typeBuilder.AddInterfaceImplementation(interfaceType);
+            var methodBuilder = typeBuilder.DefineMethod(StaticMethodName, MethodAttributes.Public | MethodAttributes.Static);
 
             expression.CompileToMethod(methodBuilder);
             methodBuilder.SetImplementationFlags(MethodImplAttributes.AggressiveInlining);
+
+            var instanceMethodBuilder = typeBuilder.DefineMethod(InstanceMethodName,
+                MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.HideBySig | MethodAttributes.NewSlot,
+                typeof(TDestination), new[] {typeof(TSource)});
+            instanceMethodBuilder.DefineParameter(1, ParameterAttributes.None, "entity");
+            instanceMethodBuilder.SetImplementationFlags(MethodImplAttributes.AggressiveInlining);
+            typeBuilder.DefineMethodOverride(instanceMethodBuilder, interfaceType.GetMethod(InstanceMethodName));
+
+            var il = instanceMethodBuilder.GetILGenerator();
+            il.Emit(OpCodes.Ldarg_1);
+            il.EmitCall(OpCodes.Call, methodBuilder, new[] { typeof(TSource) });
+            il.Emit(OpCodes.Ret);
 
             var type = typeBuilder.CreateType();
 
             return type;
         }
 
-        internal Func<TSource, TDestination> GetDelegate<TSource, TDestination>(Type type)
+        internal Func<TSource, TDestination> GetMappingDelegate<TSource, TDestination>(Type type)
         {
-            var method = (Func<TSource, TDestination>) Delegate.CreateDelegate(typeof(Func<TSource, TDestination>), type.GetMethod(type.Name));
+            var method = (Func<TSource, TDestination>) Delegate.CreateDelegate(typeof(Func<TSource, TDestination>), type.GetMethod(StaticMethodName));
 
             return method;
+        }
+
+        internal IMapping<TSource, TDestination> GetMappingObject<TSource, TDestination>(Type type)
+        {
+            var newExp = Expression.New(type);
+            var lambdaNew = Expression.Lambda(typeof(Func<IMapping<TSource, TDestination>>), newExp);
+
+            return ((Func<IMapping<TSource, TDestination>>) lambdaNew.Compile())();
         }
     }
 }

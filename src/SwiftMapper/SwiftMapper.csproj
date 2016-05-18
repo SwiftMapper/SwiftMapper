@@ -35,6 +35,7 @@
   <ItemGroup>
     <Compile Include="IMapper.cs" />
     <Compile Include="IMapperConfiguration.cs" />
+    <Compile Include="IMapping.cs" />
     <Compile Include="IMappingConfiguration.cs" />
     <Compile Include="IMappingOutput.cs" />
     <Compile Include="MapperConfiguration.cs" />

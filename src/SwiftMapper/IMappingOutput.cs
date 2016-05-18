@@ -7,5 +7,6 @@ namespace SwiftMapper
         Type MappingsType { get; set; }
 
         object GetDelegate();
+        object GetMapper();
     }
 }

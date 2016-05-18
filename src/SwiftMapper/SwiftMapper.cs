@@ -28,9 +28,10 @@ namespace SwiftMapper
         {
             var expression = _mappingCompiler.GetExpression<TSource, TDestination>();
             var type = _mappingCompiler.GetType(expression);
-            var compiled = _mappingCompiler.GetDelegate<TSource, TDestination>(type);
+            var mappingDelegate = _mappingCompiler.GetMappingDelegate<TSource, TDestination>(type);
+            var mappingObject = _mappingCompiler.GetMappingObject<TSource, TDestination>(type);
 
-            return new MappingOutput<TSource, TDestination> {Expression = expression, MappingsType = type, Delegate = compiled};
+            return new MappingOutput<TSource, TDestination> {Expression = expression, MappingsType = type, Delegate = mappingDelegate, Mapping = mappingObject};
         }
 
         public void Compile()
@@ -45,9 +46,18 @@ namespace SwiftMapper
         {
             var compiledMapping = _compiledMappings.SingleOrDefault(m => m.Key.Source == typeof(TSource) && m.Key.Destination == typeof(TDestination));
 
-            var mapper = (Func<TSource, TDestination>) compiledMapping.Value.GetDelegate();
+            var mapper = (Func<TSource, TDestination>)compiledMapping.Value.GetDelegate();
 
             return mapper(source);
+        }
+
+        public TDestination Map2<TSource, TDestination>(TSource source)
+        {
+            var compiledMapping = _compiledMappings.SingleOrDefault(m => m.Key.Source == typeof(TSource) && m.Key.Destination == typeof(TDestination));
+
+            var mapper = (IMapping<TSource, TDestination>)compiledMapping.Value.GetMapper();
+
+            return mapper.Map(source);
         }
     }
 }
